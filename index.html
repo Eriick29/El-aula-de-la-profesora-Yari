@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Taller I – Caso: El aula de la profesora Yari – Equipo Sinapsis</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Cabin+Sketch:wght@400;700&family=Caveat:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pizarra:#1f3a32; --pizarra2:#284a40; --tiza:#f4f1e8; --papel:#fbf8f1; --linea:#c9dbe8; --margen:#e58b8b;
+  --ink:#232323; --amarillo:#ffe066; --rosa:#ff9fb6; --celeste:#9fd3ee; --verde:#b8e0a8; --naranja:#f4a259; --rojo:#d64545;
+  --hand:'Caveat',cursive; --serif:'DM Serif Display',Georgia,serif; --sans:'Nunito',Segoe UI,Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:clamp(15px,calc(.6vw + .95vh),30px)}
+html,body{height:100%;overflow:hidden;background:#14231e;font-family:var(--sans);color:var(--ink)}
+h1,h2{font-family:var(--serif);font-weight:400;line-height:1.05}
+h1{font-size:clamp(2.6rem,7.5vw,5.6rem)}
+h2{font-size:clamp(1.9rem,4.4vw,3.3rem)}
+h3{font-family:var(--sans);font-weight:800;font-size:clamp(1.05rem,1.7vw,1.3rem);margin-bottom:.35rem}
+p,li{font-size:clamp(.98rem,1.4vw,1.14rem);line-height:1.55}
+.hand{font-family:var(--hand);font-weight:700}
+
+/* ---------- DECK ---------- */
+#deck{position:fixed;inset:0;bottom:var(--bar,64px)}
+.slide{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  opacity:0;visibility:hidden;transition:opacity .35s ease,visibility 0s linear .35s}
+.slide.active{opacity:1;visibility:visible;z-index:2;transition:opacity .35s ease .1s,visibility 0s}
+.inner{min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:clamp(1rem,2.3vw,1.6rem);
+  padding:clamp(1.4rem,4.5vw,3.6rem) clamp(1.1rem,6vw,5rem);max-width:100%;margin:0 auto;position:relative}
+
+/* fondos */
+.pizarra{background:
+  radial-gradient(ellipse at 20% 15%,rgba(255,255,255,.07),transparent 45%),
+  radial-gradient(ellipse at 85% 80%,rgba(255,255,255,.05),transparent 40%),
+  linear-gradient(160deg,var(--pizarra2),var(--pizarra));color:var(--tiza);
+  box-shadow:inset 0 0 0 clamp(8px,1.2vw,16px) #8a5a35, inset 0 0 0 clamp(11px,1.6vw,20px) #6b4428}
+.cuaderno{background-color:var(--papel);
+  background-image:linear-gradient(90deg,transparent clamp(38px,6vw,78px),var(--margen) clamp(38px,6vw,78px),var(--margen) calc(clamp(38px,6vw,78px) + 2px),transparent calc(clamp(38px,6vw,78px) + 2px)),
+  repeating-linear-gradient(transparent 0,transparent 33px,var(--linea) 33px,var(--linea) 34px)}
+.cuaderno .inner{padding-left:clamp(3.2rem,8vw,7rem)}
+.kraft{background:#e9dcc6;background-image:radial-gradient(rgba(120,90,50,.08) 1px,transparent 1px);background-size:6px 6px}
+
+/* piezas */
+.chalk{color:var(--tiza)}
+.underline-chalk{background:linear-gradient(transparent 70%,rgba(255,224,102,.55) 70%);padding:0 .2em}
+.tag{align-self:flex-start;font-family:var(--hand);font-size:clamp(1.3rem,2.2vw,1.75rem);padding:.1rem .9rem;border-radius:4px;transform:rotate(-2deg)}
+.grid{display:grid;gap:clamp(.9rem,2vw,1.4rem)}
+.g4{grid-template-columns:repeat(auto-fit,minmax(min(13rem,100%),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(15.5rem,100%),1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(19rem,100%),1fr))}
+
+.postit{padding:clamp(1rem,1.8vw,1.3rem);box-shadow:0 10px 18px -8px rgba(0,0,0,.35);position:relative;transition:transform .3s}
+.postit::after{content:"";position:absolute;left:0;right:0;bottom:0;height:14px;background:linear-gradient(transparent,rgba(0,0,0,.05))}
+.postit:nth-child(odd){transform:rotate(-1.6deg)}
+.postit:nth-child(even){transform:rotate(1.4deg)}
+.postit:hover{transform:rotate(0) scale(1.03)}
+.ficha{background:#fff;border-radius:6px;padding:clamp(1.1rem,2vw,1.5rem);padding-top:clamp(1.6rem,2.6vw,2rem);box-shadow:0 12px 26px -10px rgba(0,0,0,.35);position:relative}
+.cinta{position:absolute;top:-12px;left:50%;width:110px;height:26px;transform:translateX(-50%) rotate(-3deg);opacity:.85}
+.ficha h3{font-family:var(--serif);font-weight:400;font-size:clamp(1.4rem,2.3vw,1.8rem)}
+.quote{font-family:var(--hand);font-size:clamp(1.35rem,2.1vw,1.75rem);line-height:1.25}
+.quote small{display:block;font-family:var(--sans);font-size:clamp(.85rem,1.2vw,.98rem);font-weight:800;margin-top:.3rem}
+.nombres{display:flex;flex-wrap:wrap;gap:.5rem .9rem}
+.nombres span{font-family:var(--hand);font-size:clamp(1.3rem,2.2vw,1.7rem);color:var(--tiza);border-bottom:2px dashed rgba(244,241,232,.4)}
+.person p{font-size:clamp(.88rem,1.1vw,.98rem);margin-bottom:.35rem;line-height:1.45}
+.person p b{color:#6b4428}
+.who{font-family:var(--hand);font-size:1.35rem;padding:0 .6rem;border-radius:3px;margin-left:.3rem;white-space:nowrap}
+.pend{color:#9a9a9a;font-style:italic}
+.paso{display:flex;gap:1rem;align-items:flex-start}
+.paso .n{flex-shrink:0;width:2.4rem;height:2.4rem;border-radius:50%;border:2.5px solid var(--amarillo);display:grid;place-items:center;font-family:var(--hand);font-size:1.6rem;color:var(--amarillo)}
+.doodle{position:absolute;font-family:var(--hand);opacity:.85;pointer-events:none}
+
+.ic{width:1.15em;height:1.15em;vertical-align:-.2em;margin-right:.35em;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.icb{display:inline-grid;place-items:center;width:2.1em;height:2.1em;border-radius:50%;border:2px solid currentColor;margin-right:.45em;vertical-align:middle}
+.icb .ic{margin:0;width:1.15em;height:1.15em}
+.tiza-titulo{font-family:'Cabin Sketch','Caveat',cursive;font-weight:700;color:#f6f3ea;filter:url(#tiza);letter-spacing:.02em;line-height:1.05}
+.tiza-titulo .y{color:var(--amarillo);position:relative;display:inline-block}
+.tiza-titulo .y svg{position:absolute;left:-4%;bottom:-.12em;width:108%;height:.28em;overflow:visible}
+/* entrada escalonada */
+.slide .rv{opacity:0;transition:opacity .45s ease}
+.slide.active .rv{opacity:1}
+.slide.active .rv:nth-child(2){transition-delay:.08s}.slide.active .rv:nth-child(3){transition-delay:.16s}
+.slide.active .rv:nth-child(4){transition-delay:.24s}.slide.active .rv:nth-child(5){transition-delay:.32s}
+.slide.active .grid>.rv:nth-child(1){transition-delay:.2s}.slide.active .grid>.rv:nth-child(2){transition-delay:.3s}
+.slide.active .grid>.rv:nth-child(3){transition-delay:.4s}.slide.active .grid>.rv:nth-child(4){transition-delay:.5s}
+
+/* ---------- BARRA DE CONTROL ---------- */
+#bar{position:fixed;left:0;right:0;bottom:0;height:var(--bar,64px);padding-bottom:env(safe-area-inset-bottom);background:#10201b;display:flex;align-items:center;justify-content:center;gap:clamp(.6rem,2vw,1.4rem);z-index:50;border-top:3px solid #8a5a35}
+#bar button{font-family:var(--sans);font-weight:800;font-size:1rem;border:none;cursor:pointer;border-radius:999px;padding:.65rem 1.3rem;min-width:3.2rem;touch-action:manipulation}
+.tool{background:transparent!important;color:var(--tiza)!important;border:2px solid rgba(244,241,232,.45)!important;display:inline-flex;align-items:center;gap:.45rem}
+.tool:hover{border-color:var(--amarillo)!important;color:var(--amarillo)!important}
+.tool svg{width:1.15rem;height:1.15rem;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+#tools{position:absolute;right:clamp(.6rem,2vw,1.4rem);display:flex;gap:.5rem}
+@media (max-width:900px){.tool .lbl{display:none} #tools{position:static}}
+#prev{background:var(--tiza);color:var(--pizarra)}
+#next{background:var(--amarillo);color:var(--pizarra)}
+#bar button:disabled{opacity:.35;cursor:default}
+#dots{display:flex;gap:.5rem}
+#dots button{width:12px;height:12px;min-width:0;padding:0;border-radius:50%;background:rgba(244,241,232,.3)}
+#dots button.on{background:var(--amarillo);transform:scale(1.35)}
+#count{color:var(--tiza);font-family:var(--hand);font-size:1.5rem;min-width:3.2rem;text-align:center}
+@media (max-width:560px){ #dots{display:none} #bar{gap:.35rem} #bar button{padding:.55rem .75rem;white-space:nowrap;font-size:.88rem} #count{font-size:1.25rem;min-width:2.6rem} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@page{size:1920px 1080px;margin:0}
+@media print{
+  html{font-size:21px!important}
+  html,body{overflow:visible!important;height:auto!important;background:#fff}
+  #bar{display:none!important}
+  #deck{position:static}
+  .slide{position:relative!important;inset:auto;width:1920px;height:1080px;opacity:1!important;visibility:visible!important;transition:none!important;overflow:hidden!important;page-break-after:always;break-after:page}
+  .slide:last-child{page-break-after:auto;break-after:auto}
+  .slide .rv{opacity:1!important;transform:none!important;transition:none!important}
+  .inner{min-height:1080px;padding:64px 96px}
+  .cuaderno .inner{padding-left:140px}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 2l3 6 6 1-4.5 4 1 7L12 17l-5.5 3 1-7L3 9l6-1z"/></symbol>
+<symbol id="i-nube" viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z"/><path d="M9 21l1-2M13 21l1-2"/></symbol>
+<symbol id="i-rayo" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+<symbol id="i-estrella" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18"/><circle cx="12" cy="12" r="2.2"/></symbol>
+<symbol id="i-tabla" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M8.5 10h7M8.5 14h7M8.5 18h4"/></symbol>
+<symbol id="i-cerebro" viewBox="0 0 24 24"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a2 2 0 0 0-3-1z"/><path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1"/></symbol>
+<symbol id="i-brote" viewBox="0 0 24 24"><path d="M12 21v-9"/><path d="M12 12c0-4-3-6-7-6 0 4 3 6 7 6z"/><path d="M12 14c0-3 2.5-5 6-5 0 3-2.5 5-6 5z"/></symbol>
+<symbol id="i-piezas" viewBox="0 0 24 24"><path d="M4 4h6v3a2 2 0 1 0 4 0V4h6v6h-3a2 2 0 1 0 0 4h3v6h-6v-3a2 2 0 1 0-4 0v3H4v-6h3a2 2 0 1 0 0-4H4z"/></symbol>
+<symbol id="i-foco" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></symbol>
+<symbol id="i-lugar" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></symbol>
+<symbol id="i-ojo" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-corazon" viewBox="0 0 24 24"><path d="M12 20s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6.2-8 11-8 11z"/><path d="M5 12h4l1.5-2.5 2 5 1.5-2.5H19"/></symbol>
+<symbol id="i-silencio" viewBox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-7l-4 3v-3H6a2 2 0 0 1-2-2z"/><path d="M9 8.5l6 5M15 8.5l-6 5"/></symbol>
+<symbol id="i-deseo" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></symbol>
+<filter id="tiza" x="-5%" y="-10%" width="110%" height="120%">
+  <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="3" result="n"/>
+  <feDisplacementMap in="SourceGraphic" in2="n" scale="2.5" xChannelSelector="R" yChannelSelector="G" result="d"/>
+  <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" seed="7" result="g"/>
+  <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.5 0 0 0 1.55" result="m"/>
+  <feComposite in="d" in2="m" operator="in"/>
+</filter>
+</defs></svg>
+<main id="deck">
+
+<!-- 1 · PORTADA (pizarra) -->
+<section class="slide pizarra active" aria-label="Portada">
+  <div class="inner">
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(26rem,100%),1fr));align-items:center;gap:clamp(1.5rem,4vw,4rem)">
+      <div style="display:flex;flex-direction:column;gap:clamp(1rem,2.3vw,1.6rem)">
+        <span class="tag rv" style="background:var(--amarillo);color:var(--pizarra)">Taller I – Caso · Equipo Sinapsis</span>
+        <h1 class="tiza-titulo rv">El aula de la<br>profesora <span class="y">Yari<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12 C50 4,110 18,196 7" fill="none" stroke="#ffe066" stroke-width="5" stroke-linecap="round"/></svg></span></h1>
+        <p class="hand rv" style="font-size:clamp(1.6rem,3vw,2.3rem);color:var(--amarillo)">Lo analizamos desde la corriente humanista</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:clamp(1.2rem,2.6vw,2rem)">
+        <div class="postit rv" style="background:var(--papel);color:var(--ink);transform:rotate(-1deg)">
+      <h3 style="color:var(--rojo)"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>El caso</h3>
+      <p>Yari enseña Ciencias Naturales a <b>38 estudiantes de 10°</b> en San Miguelito. <b>Luis</b> tiene TDAH y se distrae; <b>Mariela</b> tiene altas capacidades y se aburre. Yari usa dictados y copia del libro. Resultados bajos, ambiente tenso. La coordinadora dice: <i>"No se esfuerzan"</i>.</p>
+    </div>
+        <div class="nombres rv">
+      <span>Patricia Del Cid</span><span>Lisseth G. De Gracia</span><span>Yarisell Gonzalez</span><span>Laura Guerra</span><span>Erick Santos</span>
+    </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · CORRIENTE (cuaderno) -->
+<section class="slide cuaderno" aria-label="Corriente humanista">
+  <div class="inner">
+    <span class="tag rv" style="background:var(--celeste)">1 · La corriente</span>
+    <h2 class="rv">Humanismo: primero la persona,<br>después el contenido</h2>
+    <p class="rv" style="max-width:56.25rem"><b>Carl Rogers y Abraham Maslow:</b> el estudiante aprende cuando se siente aceptado, seguro y valorado. Si sus necesidades emocionales no están cubiertas, el aprendizaje se bloquea.</p>
+    <div class="grid g4 rv">
+      <div class="postit rv" style="background:var(--amarillo)"><h3><span class="icb"><svg class="ic" aria-hidden="true"><use href="#i-nube"/></svg></span>Ambiente tenso</h3><p>Quien se siente juzgado no participa ni pregunta.</p></div>
+      <div class="postit rv" style="background:var(--rosa)"><h3><span class="icb"><svg class="ic" aria-hidden="true"><use href="#i-rayo"/></svg></span>Luis</h3><p>Necesita sentirse comprendido, no regañado por distraerse.</p></div>
+      <div class="postit rv" style="background:var(--celeste)"><h3><span class="icb"><svg class="ic" aria-hidden="true"><use href="#i-estrella"/></svg></span>Mariela</h3><p>Necesita que reconozcan sus capacidades y le den retos.</p></div>
+      <div class="postit rv" style="background:var(--verde)"><h3><span class="icb"><svg class="ic" aria-hidden="true"><use href="#i-tabla"/></svg></span>La coordinadora</h3><p>Culpa a los estudiantes sin preguntarse qué necesitan.</p></div>
+    </div>
+    <p class="quote rv" style="color:#2b5d8a">"Elegimos el humanismo porque un estudiante no es solo una nota: tiene sentimientos, habilidades y su propia forma de aprender."<small>— Lisseth Gabriela De Gracia</small></p>
+  </div>
+</section>
+
+<!-- 3 · TRES PREGUNTAS (kraft + fichas) -->
+<section class="slide kraft" aria-label="Las tres preguntas">
+  <div class="inner">
+    <span class="tag rv" style="background:var(--rosa)">2 · Las tres preguntas</span>
+    <h2 class="rv">Qué hace, qué cambiaría y qué riesgo hay</h2>
+    <div class="grid g3 rv">
+      <div class="ficha rv"><span class="cinta" style="background:var(--rosa)"></span><h3>¿Qué hace Yari?</h3><p>Usa dictados y copia del libro: un método tradicional que no deja participar ni despierta interés. Aplica la misma estrategia a 38 estudiantes sin ver que cada uno tiene necesidades distintas. Su relación con el grupo es distante, y eso aumenta la tensión.</p></div>
+      <div class="ficha rv"><span class="cinta" style="background:var(--celeste)"></span><h3>¿Qué cambiaría?</h3><p>Usaría estrategias dinámicas: experimentos, trabajo en equipo y ejemplos de la vida diaria. Conocería a sus estudiantes para saber sus fortalezas y dificultades, y crearía un ambiente de confianza donde equivocarse no dé miedo.</p></div>
+      <div class="ficha rv"><span class="cinta" style="background:var(--naranja)"></span><h3>¿Qué riesgo tiene?</h3><p>Por comprender a Luis y a Mariela, Yari podría dejar de poner límites: Luis seguiría distraído y Mariela molestando, sin consecuencias. Con 38 estudiantes y sin normas claras, la clase se descontrola. <b style="color:var(--rojo)">Comprender no es permitirlo todo.</b></p></div>
+    </div>
+    <div class="postit rv" style="background:var(--amarillo);max-width:51.25rem;align-self:center"><p class="quote">"Yari no es mala profesora: enseña como a ella le enseñaron. Lo que falta es que mire a cada estudiante y no solo al libro."<small>— Yarisell Gonzalez</small></p></div>
+  </div>
+</section>
+
+<!-- 4 · ACCIÓN (pizarra) -->
+<section class="slide pizarra" aria-label="Acción concreta">
+  <div class="inner">
+    <span class="tag rv" style="background:var(--amarillo);color:var(--pizarra)">3 · Acción concreta para mañana</span>
+    <h2 class="chalk rv">Esquemas para completar + pausas para explicar</h2>
+    <div class="grid g2 rv" style="align-items:start">
+      <div style="display:flex;flex-direction:column;gap:1.2rem">
+        <div class="paso rv"><span class="n">1</span><div><h3 class="chalk" style="color:var(--amarillo)"><svg class="ic" aria-hidden="true"><use href="#i-cerebro"/></svg>Neuroeducación</h3><p class="chalk">Yari proyecta un esquema con espacios en blanco en los conceptos clave. Los estudiantes lo completan mientras ella explica, en vez de copiar todo.</p></div></div>
+        <div class="paso rv"><span class="n">2</span><div><h3 class="chalk" style="color:var(--amarillo)"><svg class="ic" aria-hidden="true"><use href="#i-brote"/></svg>Plasticidad cerebral</h3><p class="chalk">Cada 10–12 minutos, pausa: cada uno explica el tema con sus palabras al compañero de al lado o lo dibuja con un ejemplo.</p></div></div>
+        <div class="paso rv"><span class="n">3</span><div><h3 class="chalk" style="color:var(--amarillo)"><svg class="ic" aria-hidden="true"><use href="#i-piezas"/></svg>Neurodiversidad</h3><p class="chalk"><b>Luis:</b> el esquema dividido en partes cortas y reparte el material para moverse. <b>Mariela:</b> pregunta de reto para relacionar el tema con la vida real.</p></div></div>
+      </div>
+      <div class="postit rv" style="background:var(--papel);color:var(--ink);transform:rotate(1.5deg)">
+        <h3 style="color:var(--rojo)"><svg class="ic" aria-hidden="true"><use href="#i-foco"/></svg>¿Por qué funciona?</h3>
+        <ul style="padding-left:1.2rem;display:flex;flex-direction:column;gap:.4rem">
+          <li>La atención dura poco: las pausas la renuevan.</li>
+          <li>Explicar con sus palabras refuerza las conexiones del cerebro.</li>
+          <li>Completar el esquema obliga a pensar, no solo a copiar.</li>
+          <li>Con menos estrés y más confianza, se aprende mejor.</li>
+        </ul>
+        <p class="quote" style="color:#2b5d8a;margin-top:.8rem">"Es una acción sencilla: no necesita materiales caros y Yari la puede aplicar mañana mismo."<small style="color:var(--ink)">— Laura Guerra</small></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · PERSONALIZACIÓN 1 (cuaderno) -->
+<section class="slide cuaderno" aria-label="Personalización 1">
+  <div class="inner">
+    <span class="tag rv" style="background:var(--verde)">4 · Personalización del caso</span>
+    <h2 class="rv">Nosotros también fuimos Luis</h2>
+    <div class="grid g2 rv">
+      <div class="ficha person rv"><span class="cinta" style="background:var(--naranja)"></span>
+        <h3>Erick Santos <span class="who" style="background:var(--naranja)">como Luis</span></h3>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-lugar"/></svg>Dónde:</b> Colegio Victoriano Lorenzo, Las Lomas, David, Chiriquí. 15 años, 10° grado.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-ojo"/></svg>Qué pasó:</b> última hora, Matemáticas. Salón caliente, abanico dañado, olor a marcador. Estaba en la última fila junto a la puerta. Cuando levanté la mirada ya habían borrado medio tablero; pedí que esperara y el profesor me dijo de mala forma que ya lo había explicado.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-corazon"/></svg>En el cuerpo:</b> calor en la cara y ganas de desaparecer.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-silencio"/></svg>Qué hice:</b> no dije nada; copié lo que pude y dejé el resto en blanco.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-deseo"/></svg>Me habría gustado:</b> que esperara antes de borrar y poder sentarme más adelante.</p>
+      </div>
+      <div class="ficha person rv"><span class="cinta" style="background:var(--rosa)"></span>
+        <h3>Patricia Del Cid <span class="who" style="background:var(--rosa)">como Luis</span></h3>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-lugar"/></svg>Dónde:</b> [colegio], [provincia]. [edad] años, sexto año.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-ojo"/></svg>Qué pasó:</b> una tía estaba en cirugía, grave por una septicemia. Yo estaba frente al tablero, con vista al patio central; mi cuerpo estaba en clase, pero mi mente en el hospital.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-corazon"/></svg>En el cuerpo:</b> muchas ganas de llorar y un nudo en la garganta.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-silencio"/></svg>Qué hice:</b> no le conté a ningún docente ni amigo.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-deseo"/></svg>Me habría gustado:</b> que un docente notara mi silencio; siempre fui alegre y ese día no hablaba.</p>
+      </div>
+    </div>
+    <div class="postit rv" style="background:var(--amarillo);max-width:53.75rem;align-self:center"><p class="quote">"Un estudiante distraído no siempre es un estudiante flojo. A veces solo necesita que le enseñen de otra manera."<small>— Erick Santos</small></p></div>
+  </div>
+</section>
+
+<!-- 6 · PERSONALIZACIÓN 2 + CIERRE (kraft) -->
+<section class="slide kraft" aria-label="Personalización 2 y conclusión">
+  <div class="inner">
+        <div class="grid g3 rv">
+      <div class="ficha person rv"><span class="cinta" style="background:var(--celeste)"></span>
+        <h3>Lisseth G. De Gracia <span class="who" style="background:var(--celeste)">como Luis</span></h3>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-lugar"/></svg>Dónde:</b> IPT Chiriquí Grande, Bocas del Toro. 16 años, 5° año.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-ojo"/></svg>Qué pasó:</b> sentada al fondo, con camisa blanca y falda crema. El aula olía a humedad. El profesor dictaba Biología rapidísimo, advirtiendo del examen, y yo solo miraba la lluvia por la ventana.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-corazon"/></svg>En el cuerpo:</b> calor en la cara por la frustración y ganas de estar en otro lugar.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-silencio"/></svg>Qué hice:</b> me quedé paralizada mirando la página en blanco; no pedí ayuda por pena.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-deseo"/></svg>Me habría gustado:</b> que el profesor usara un esquema en el tablero en vez de solo dictar, o que una compañera me prestara sus apuntes.</p>
+      </div>
+      <div class="ficha person rv"><span class="cinta" style="background:var(--amarillo)"></span>
+        <h3>Yarisell Gonzalez <span class="who" style="background:var(--amarillo)">como [personaje]</span></h3>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-lugar"/></svg>Dónde:</b> <span class="pend">[colegio], [provincia], [edad] años.</span></p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-ojo"/></svg>Qué pasó:</b> <span class="pend">[olor, lugar, frase, ropa].</span></p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-corazon"/></svg>En el cuerpo:</b> <span class="pend">[sensación].</span></p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-silencio"/></svg>Qué hice:</b> <span class="pend">[qué hizo o no se atrevió].</span></p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-deseo"/></svg>Me habría gustado:</b> <span class="pend">[qué esperaba].</span></p>
+      </div>
+      <div class="ficha person rv"><span class="cinta" style="background:var(--naranja)"></span>
+        <h3>Laura Guerra <span class="who" style="background:var(--naranja)">como Luis</span></h3>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-lugar"/></svg>Dónde:</b> escuela de Tolé, Chiriquí. 11 años.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-ojo"/></svg>Qué pasó:</b> el docente explicaba y llenaba el tablero para que copiáramos. La clase se hacía larga y repetitiva; yo necesitaba una explicación más dinámica para entender.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-corazon"/></svg>En el cuerpo:</b> cansancio, frustración y algo de desesperación; solo quería que la clase terminara.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-silencio"/></svg>Qué hice:</b> me quedé callada y seguí copiando. No me atreví a pedir otra explicación por miedo a que pensaran que no prestaba atención.</p>
+        <p><b><svg class="ic" aria-hidden="true"><use href="#i-deseo"/></svg>Me habría gustado:</b> que el docente tuviera más paciencia, me escuchara y explicara de otra forma. Una palabra de ánimo me habría devuelto la confianza.</p>
+      </div>
+    </div>
+    <div class="grid g2 rv" style="align-items:center">
+      <div class="postit" style="background:var(--rosa);padding:.8rem 1rem"><p class="quote" style="font-size:clamp(1.15rem,1.7vw,1.45rem)">"Detrás de un estudiante distraído puede haber un problema que nadie ve. Un docente atento hace la diferencia."<small>— Patricia Del Cid</small></p></div>
+      <div class="pizarra" style="border-radius:8px;padding:clamp(.8rem,1.5vw,1.1rem) clamp(1rem,2.4vw,1.6rem);box-shadow:inset 0 0 0 6px #8a5a35">
+      <p class="hand chalk" style="font-size:clamp(1.2rem,1.9vw,1.6rem);text-align:center;line-height:1.2"><span style="color:var(--amarillo)">Conclusión del equipo:</span> no es que no se esfuercen; es que la clase no está pensada para todos.</p>
+    </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<nav id="bar" aria-label="Navegación">
+  <button id="prev" aria-label="Anterior">◀ Atrás</button>
+  <div id="dots"></div>
+  <span id="count">1 / 6</span>
+  <button id="next" aria-label="Siguiente">Siguiente ▶</button>
+  <div id="tools">
+    <button id="fs" class="tool" title="Pantalla completa (F)" aria-label="Pantalla completa"><svg viewBox="0 0 24 24"><path id="fsico" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl" id="fslbl">Pantalla completa</span></button>
+    <button id="pdf" class="tool" title="Descargar PDF" aria-label="Descargar PDF"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
+  </div>
+</nav>
+
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  const prev=document.getElementById('prev'), next=document.getElementById('next');
+  const count=document.getElementById('count'), dots=document.getElementById('dots');
+  let i=0;
+  slides.forEach((_,k)=>{const b=document.createElement('button');b.setAttribute('aria-label','Ir a diapositiva '+(k+1));b.addEventListener('click',()=>go(k));dots.appendChild(b);});
+  function go(n){
+    n=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>{s.classList.toggle('active',k===n);s.classList.toggle('prev',k<n);});
+    slides[n].scrollTop=0; i=n;
+    count.textContent=(i+1)+' / '+slides.length;
+    prev.disabled=i===0; next.disabled=i===slides.length-1;
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+    try{history.replaceState(null,'','#'+(i+1));}catch(e){}
+    fit();
+  }
+  // ajusta el tamaño del texto para que la diapositiva activa quepa en la pantalla
+  const root=document.documentElement;
+  function fit(){
+    root.style.fontSize='';
+    if(window.innerWidth<=640)return;
+    const s=slides[i], base=parseFloat(getComputedStyle(root).fontSize);
+    let f=base;
+    while(s.scrollHeight>s.clientHeight+20 && f>base*0.72){f-=0.5;root.style.fontSize=f+'px';}
+  }
+  let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(fit,120);});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
+  // pantalla completa
+  const fsBtn=document.getElementById('fs'), fsLbl=document.getElementById('fslbl'), fsIco=document.getElementById('fsico');
+  function isFS(){return document.fullscreenElement||document.webkitFullscreenElement;}
+  function toggleFS(){
+    const el=document.documentElement;
+    if(!isFS()){const r=el.requestFullscreen||el.webkitRequestFullscreen; if(r){const pr=r.call(el); if(pr&&pr.catch)pr.catch(()=>alert('Tu navegador no permite pantalla completa aquí. Abre el archivo directamente en Chrome o Edge.'));}}
+    else{(document.exitFullscreen||document.webkitExitFullscreen).call(document);}
+  }
+  function fsUI(){const on=!!isFS();fsLbl.textContent=on?'Salir':'Pantalla completa';fsIco.setAttribute('d',on?'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5':'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5');setTimeout(fit,150);}
+  fsBtn.addEventListener('click',toggleFS);
+  document.addEventListener('fullscreenchange',fsUI);document.addEventListener('webkitfullscreenchange',fsUI);
+  // PDF Full HD: imprime 6 páginas de 1920×1080 → elegir "Guardar como PDF"
+  document.getElementById('pdf').addEventListener('click',()=>{
+    const t=document.title; document.title='Taller I - El aula de la profesora Yari - Equipo Sinapsis';
+    window.print(); setTimeout(()=>{document.title=t;},1000);
+  });
+  window.addEventListener('afterprint',fit);
+  prev.addEventListener('click',()=>go(i-1));
+  next.addEventListener('click',()=>go(i+1));
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown','Enter'].includes(e.key)||e.key===' '){e.preventDefault();go(i+1);}
+    else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();go(i-1);}
+    else if(e.key==='Home')go(0); else if(e.key==='End')go(slides.length-1);
+    else if(e.key==='f'||e.key==='F'){toggleFS();}
+  });
+  // deslizar con el dedo (horizontal)
+  let x0=null,y0=null;
+  document.getElementById('deck').addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY;},{passive:true});
+  document.getElementById('deck').addEventListener('touchend',e=>{
+    if(x0===null)return;const dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.3){go(i+(dx<0?1:-1));}
+    x0=null;
+  },{passive:true});
+  const start=parseInt((location.hash||'').slice(1),10);
+  go(isNaN(start)?0:start-1);
+})();
+</script>
+</body>
+</html>
